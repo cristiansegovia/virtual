@@ -7,8 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+<<<<<<< HEAD
         "barryvdh/laravel-dompdf": "*",
         "filament/filament": "4.0",
+=======
+        "filament/filament":  "^4.1",
+>>>>>>> 020aa9e29fd9ca871a5432b478cc2e725e73c1ef
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
     },
