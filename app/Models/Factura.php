@@ -35,6 +35,13 @@ class Factura extends Model
         return $this->belongsToMany(Plan::class);
     }
 
+    public function getInvoiceNumberAttribute(): string
+    {
+        return str_pad($this->id, 5, '0', STR_PAD_LEFT);
+    }
+
+    protected static $updatingTotal = false;
+
     protected static function boot()
     {
         parent::boot();
@@ -44,10 +51,17 @@ class Factura extends Model
             if ($factura->fecha_emision) {
                 $factura->fecha_vencimiento = $factura->fecha_emision->addDays(7);
             }
+        });
 
-            // Calcular total como suma de valores de planes
-            if ($factura->planes->isNotEmpty()) {
-                $factura->total = $factura->planes->sum('valor');
+        static::saved(function ($factura) {
+            if (!self::$updatingTotal) {
+                self::$updatingTotal = true;
+                $calculated = $factura->planes->sum('valor');
+                if ($factura->total != $calculated) {
+                    $factura->total = $calculated;
+                    $factura->save();
+                }
+                self::$updatingTotal = false;
             }
         });
     }

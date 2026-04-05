@@ -31,6 +31,7 @@ class FacturaForm
                     ])
                     ->required(),
                 CheckboxList::make('planes')
+                    ->relationship('planes', 'nombre')
                     ->options(fn ($get) => $get('cliente_id') ? Plan::whereHas('clientes', fn($q) => $q->where('clientes.id', $get('cliente_id')))->pluck('nombre', 'id') : [])
                     ->searchable()
                     ->live()
