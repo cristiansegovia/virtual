@@ -33,6 +33,16 @@ class Cliente extends Model
         return $this->belongsToMany(Plan::class);
     }
 
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'id_cliente');
+    }
+
+    public function facturas()
+    {
+        return $this->hasMany(Factura::class, 'cliente_id');
+    }
+
     protected static function boot()
     {
         parent::boot();
