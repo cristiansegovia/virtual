@@ -14,6 +14,7 @@ class Asistencia extends Model
         'contador_asistencias',
         'estado',
         'duracion',
+        'clases_consumidas',
     ];
 
     protected function casts(): array
@@ -24,6 +25,7 @@ class Asistencia extends Model
             'estado' => 'boolean',
             'duracion' => 'integer',
             'contador_asistencias' => 'integer',
+            'clases_consumidas' => 'integer',
         ];
     }
 

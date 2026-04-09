@@ -13,6 +13,7 @@ class Plan extends Model
         'periodo',
         'categoria',
         'estado',
+        'contador',
     ];
 
     protected function casts(): array
@@ -20,6 +21,7 @@ class Plan extends Model
         return [
             'valor' => 'double',
             'estado' => 'boolean',
+            'contador' => 'integer',
         ];
     }
 

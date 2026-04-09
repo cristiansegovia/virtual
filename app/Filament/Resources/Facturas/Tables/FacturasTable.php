@@ -17,6 +17,8 @@ class FacturasTable
             ->columns([
                 TextColumn::make('cliente.nombre')
                     ->label('Cliente')
+                    ->formatStateUsing(fn ($record) => trim("{$record->cliente->nombre} {$record->cliente->apellido}"))
+                    ->searchable(['nombre', 'apellido'])
                     ->sortable(),
                 TextColumn::make('periodo')
                     ->sortable(),

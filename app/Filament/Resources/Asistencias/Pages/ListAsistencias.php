@@ -30,7 +30,13 @@ class ListAsistencias extends ListRecords
                         ->getOptionLabelFromRecordUsing(fn ($record) => trim("{$record->nombre} {$record->apellido} ({$record->dni})"))
                         ->searchable(['nombre', 'apellido', 'dni'])
                         ->required()
-                        ->label('Buscar Cliente')
+                        ->label('Buscar Cliente'),
+                    \Filament\Forms\Components\TextInput::make('cantidad_clases')
+                        ->numeric()
+                        ->default(1)
+                        ->minValue(1)
+                        ->required()
+                        ->label('Cantidad de Clases')
                 ])
                 ->action(function (array $data) {
                     $cliente = Cliente::find($data['id_cliente']);
@@ -49,30 +55,93 @@ class ListAsistencias extends ListRecords
                             ->send();
                         return;
                     }
+                    $planes = $cliente->planes;
                     
-                    $dia_img = $cliente->fecha_de_ingreso ? $cliente->fecha_de_ingreso->day : 1;
-                    $max_days_current_month = $hoy->copy()->endOfMonth()->day;
-                    
-                    $dia_X = min($dia_img, $max_days_current_month);
-                    
-                    if ($hoy->day >= $dia_X) {
-                        $inicio_mes = $hoy->copy()->day($dia_X)->startOfDay();
-                    } else {
-                        $last_month = $hoy->copy()->subMonth();
-                        $dia_X_last_month = min($dia_img, $last_month->endOfMonth()->day);
-                        $inicio_mes = $last_month->day($dia_X_last_month)->startOfDay();
+                    if ($planes->isEmpty()) {
+                        Notification::make()
+                            ->title('Acceso Denegado')
+                            ->body('El cliente no tiene ningún plan asignado.')
+                            ->danger()
+                            ->send();
+                        return;
                     }
                     
-                    $count = Asistencia::where('id_cliente', $cliente->id)
+                    $tieneFacturaValida = false;
+                    $ultimaEmisionValida = null;
+                    
+                    $facturas = $cliente->facturas()->orderBy('fecha_emision', 'desc')->get();
+                    
+                    foreach ($facturas as $factura) {
+                        if (!in_array($factura->estado, ['vigente', 'pagada'])) {
+                            continue;
+                        }
+                        
+                        $emision = clone ($factura->fecha_emision ?? $factura->created_at);
+                        $emision->startOfDay();
+                        
+                        $fin = clone $emision;
+                        switch (strtolower($factura->periodo)) {
+                            case 'diario': $fin->addDay(); break;
+                            case 'mensual': $fin->addMonth(); break;
+                            case 'trimestral': $fin->addMonths(3); break;
+                            case 'semestral': $fin->addMonths(6); break;
+                            case 'anual': $fin->addYear(); break;
+                            case 'pase libre': $fin->addMonth(); break;
+                            default: $fin->addMonth(); break;
+                        }
+                        $fin->endOfDay();
+                        
+                        if ($hoy->betweenIncluded($emision, $fin)) {
+                            $tieneFacturaValida = true;
+                            $ultimaEmisionValida = clone $emision;
+                            break;
+                        }
+                    }
+
+                    if (!$tieneFacturaValida) {
+                        Notification::make()
+                            ->title('Deuda Detectada')
+                            ->body('El cliente no posee una factura vigente o pagada que cubra la fecha actual.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                    
+                    $esIlimitado = $planes->contains('contador', 0);
+                    $limiteTope = $planes->sum('contador');
+                    
+                    $inicio_mes = $ultimaEmisionValida;
+                    
+                    $visitasEstePeriodo = Asistencia::where('id_cliente', $cliente->id)
                         ->where('created_at', '>=', $inicio_mes)
-                        ->count() + 1;
+                        ->sum('clases_consumidas');
+                        
+                    $restantes = 0;
+                    $clases_pedidas = (int) $data['cantidad_clases'];
+                    
+                    if (!$esIlimitado) {
+                        $restantesActuales = $limiteTope - $visitasEstePeriodo;
+                        
+                        // Check if the user has enough balance for requested classes
+                        if ($restantesActuales < $clases_pedidas) {
+                            Notification::make()
+                                ->title('Límite insuficiente')
+                                ->body("El cliente solicita {$clases_pedidas} clases, pero solo dispone de {$restantesActuales} asistencias en su tope de este período.")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        $restantes = $restantesActuales - $clases_pedidas;
+                    }
                         
                     Asistencia::create([
                         'id_cliente' => $cliente->id,
                         'fecha_hora_ingreso' => $hoy,
                         'fecha_hora_salida' => null,
                         'origen' => 'admin',
-                        'contador_asistencias' => $count,
+                        'contador_asistencias' => $restantes,
+                        'clases_consumidas' => $clases_pedidas,
                         'estado' => true,
                         'duracion' => null,
                         'created_at' => $hoy,

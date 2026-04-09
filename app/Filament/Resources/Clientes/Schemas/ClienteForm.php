@@ -28,7 +28,7 @@ class ClienteForm
                 \Filament\Schemas\Components\Section::make('Estado e Inscripción')->schema([
                     \Filament\Schemas\Components\Group::make([
                         \Filament\Forms\Components\Toggle::make('estado')->default(true),
-                        \Filament\Forms\Components\DatePicker::make('fecha_de_ingreso')->native(false),
+                        \Filament\Forms\Components\DatePicker::make('fecha_de_ingreso')->native(false)->default(now()),
                         \Filament\Forms\Components\DatePicker::make('fecha_de_egreso')->native(false),
                     ])->columns(3),
                 ]),

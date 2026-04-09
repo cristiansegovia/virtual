@@ -15,11 +15,11 @@ class AsistenciasTable
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('cliente.nombre_completo')
                     ->label('Cliente')
-                    ->getStateUsing(fn ($record) => $record->cliente->nombre . ' ' . $record->cliente->apellido)
+                    ->getStateUsing(fn($record) => $record->cliente->nombre . ' ' . $record->cliente->apellido)
                     ->searchable(query: function (\Illuminate\Database\Eloquent\Builder $query, string $search) {
                         $query->whereHas('cliente', function ($q) use ($search) {
                             $q->where('nombre', 'like', "%{$search}%")
-                              ->orWhere('apellido', 'like', "%{$search}%");
+                                ->orWhere('apellido', 'like', "%{$search}%");
                         });
                     })
                     ->color('primary')
@@ -42,7 +42,7 @@ class AsistenciasTable
                                     ->schema([
                                         \Filament\Infolists\Components\TextEntry::make('cliente.planes_list')
                                             ->label('Planes Inscritos')
-                                            ->getStateUsing(fn ($record) => $record->cliente->planes->pluck('nombre')->implode(', ') ?: 'Ninguno'),
+                                            ->getStateUsing(fn($record) => $record->cliente->planes->pluck('nombre')->implode(', ') ?: 'Ninguno'),
                                     ]),
                                 \Filament\Schemas\Components\Section::make('Estado de Facturación')
                                     ->schema([
@@ -75,16 +75,16 @@ class AsistenciasTable
                     ->placeholder('En curso'),
                 \Filament\Tables\Columns\TextColumn::make('movimiento')
                     ->label('Movimiento')
-                    ->getStateUsing(fn ($record) => $record->fecha_hora_salida ? 'Salida' : 'Ingreso')
+                    ->getStateUsing(fn($record) => $record->fecha_hora_salida ? 'Salida' : 'Ingreso')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'Ingreso' => 'success',
                         'Salida' => 'danger',
                     }),
                 \Filament\Tables\Columns\TextColumn::make('duracion')
                     ->label('Duración (min)'),
                 \Filament\Tables\Columns\TextColumn::make('contador_asistencias')
-                    ->label('Asistencias (mes)'),
+                    ->label('Restantes'),
                 \Filament\Tables\Columns\TextColumn::make('origen')
                     ->label('Origen'),
                 \Filament\Tables\Columns\TextColumn::make('updated_at')
