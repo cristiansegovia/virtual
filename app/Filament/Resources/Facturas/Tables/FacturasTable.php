@@ -21,16 +21,21 @@ class FacturasTable
                     ->searchable(['nombre', 'apellido'])
                     ->sortable(),
                 TextColumn::make('periodo')
+                    ->label('Período')
                     ->sortable(),
                 TextColumn::make('estado')
+                    ->label('Estado')
                     ->sortable(),
                 TextColumn::make('fecha_emision')
+                    ->label('Fecha de Emisión')
                     ->date()
                     ->sortable(),
                 TextColumn::make('fecha_vencimiento')
+                    ->label('Fecha de Vencimiento')
                     ->date()
                     ->sortable(),
                 TextColumn::make('total')
+                    ->label('Total')
                     ->money('USD')
                     ->sortable(),
             ])

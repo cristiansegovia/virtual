@@ -12,8 +12,9 @@ class PlanForm
             ->components([
                 \Filament\Schemas\Components\Section::make('Detalles del Plan')->schema([
                     \Filament\Schemas\Components\Group::make([
-                        \Filament\Forms\Components\TextInput::make('nombre')->required(),
+                        \Filament\Forms\Components\TextInput::make('nombre')->label('Nombre')->required(),
                         \Filament\Forms\Components\Select::make('categoria')
+                            ->label('Categoría')
                             ->options([
                                 'Acondicionamiento Fisico' => 'Acondicionamiento Fisico',
                                 'Tecnica de Boxeo' => 'Tecnica de Boxeo',
@@ -22,10 +23,12 @@ class PlanForm
                                 'Otro' => 'Otro',
                             ])->required(),
                         \Filament\Forms\Components\TextInput::make('valor')
+                            ->label('Valor')
                             ->numeric()
                             ->prefix('$')
                             ->required(),
                         \Filament\Forms\Components\Select::make('periodo')
+                            ->label('Período')
                             ->options([
                                 'Diario' => 'Diario',
                                 'Mensual' => 'Mensual',
@@ -39,8 +42,8 @@ class PlanForm
                             ->label('Tope de Clases (0 = Ilimitado)')
                             ->helperText('Cantidad máxima de clases permitidas en el período.'),
                     ])->columns(2),
-                    \Filament\Forms\Components\Textarea::make('descripcion')->columnSpanFull(),
-                    \Filament\Forms\Components\Toggle::make('estado')->default(true)->required(),
+                    \Filament\Forms\Components\Textarea::make('descripcion')->label('Descripción')->columnSpanFull(),
+                    \Filament\Forms\Components\Toggle::make('estado')->label('Estado')->default(true)->required(),
                 ]),
             ]);
     }

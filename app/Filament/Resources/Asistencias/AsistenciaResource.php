@@ -17,6 +17,9 @@ class AsistenciaResource extends Resource
 {
     protected static ?string $model = Asistencia::class;
 
+    protected static ?string $modelLabel = 'Asistencia';
+    protected static ?string $pluralModelLabel = 'Asistencias';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

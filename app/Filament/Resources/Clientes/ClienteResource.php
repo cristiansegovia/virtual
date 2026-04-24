@@ -18,6 +18,9 @@ class ClienteResource extends Resource
 {
     protected static ?string $model = Cliente::class;
 
+    protected static ?string $modelLabel = 'Cliente';
+    protected static ?string $pluralModelLabel = 'Clientes';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

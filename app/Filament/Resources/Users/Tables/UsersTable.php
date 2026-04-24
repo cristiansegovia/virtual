@@ -13,9 +13,9 @@ class UsersTable
     {
         return $table
             ->columns([
-                \Filament\Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('email')->searchable()->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('name')->label('Nombre')->searchable()->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('email')->label('Correo Electrónico')->searchable()->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('created_at')->label('Fecha de Creación')->dateTime()->sortable(),
             ])
             ->filters([
                 //

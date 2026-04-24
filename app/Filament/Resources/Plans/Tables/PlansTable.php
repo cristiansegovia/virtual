@@ -13,11 +13,11 @@ class PlansTable
     {
         return $table
             ->columns([
-                \Filament\Tables\Columns\TextColumn::make('nombre')->searchable()->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('categoria')->searchable()->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('valor')->money('USD')->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('periodo')->searchable(),
-                \Filament\Tables\Columns\IconColumn::make('estado')->boolean(),
+                \Filament\Tables\Columns\TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('categoria')->label('Categoría')->searchable()->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('valor')->label('Valor')->money('USD')->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('periodo')->label('Período')->searchable(),
+                \Filament\Tables\Columns\IconColumn::make('estado')->label('Estado')->boolean(),
             ])
             ->filters([
                 //

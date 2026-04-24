@@ -18,6 +18,9 @@ class TurnoResource extends Resource
 {
     protected static ?string $model = Turno::class;
 
+    protected static ?string $modelLabel = 'Turno';
+    protected static ?string $pluralModelLabel = 'Turnos';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema
