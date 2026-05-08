@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('facturas', function (Blueprint $table) {
+            $table->dropForeign(['cliente_id']);
             $table->dropUnique('facturas_cliente_id_periodo_unique');
+            $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
         });
     }
 
