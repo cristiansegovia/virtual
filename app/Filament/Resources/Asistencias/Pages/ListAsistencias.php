@@ -48,21 +48,51 @@ class ListAsistencias extends ListRecords
                         ->exists();
 
                     if ($asistenciaAbierta) {
-                        Notification::make()
-                            ->title('Error al registrar ingreso')
-                            ->body('El cliente ya se encuentra dentro del gimnasio (tiene un ingreso abierto).')
-                            ->danger()
-                            ->send();
+                        $this->js("
+                            const showAlert = () => {
+                                Swal.fire({
+                                    title: 'Error al registrar ingreso',
+                                    text: 'El cliente ya se encuentra dentro del gimnasio (tiene un ingreso abierto).',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar',
+                                    confirmButtonColor: '#10b981',
+                                    allowOutsideClick: false
+                                });
+                            };
+                            if (typeof Swal === 'undefined') {
+                                let script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                                script.onload = showAlert;
+                                document.head.appendChild(script);
+                            } else {
+                                showAlert();
+                            }
+                        ");
                         return;
                     }
                     $planes = $cliente->planes;
                     
                     if ($planes->isEmpty()) {
-                        Notification::make()
-                            ->title('Acceso Denegado')
-                            ->body('El cliente no tiene ningún plan asignado.')
-                            ->danger()
-                            ->send();
+                        $this->js("
+                            const showAlert = () => {
+                                Swal.fire({
+                                    title: 'Acceso Denegado',
+                                    text: 'El cliente no tiene ningún plan asignado.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar',
+                                    confirmButtonColor: '#10b981',
+                                    allowOutsideClick: false
+                                });
+                            };
+                            if (typeof Swal === 'undefined') {
+                                let script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                                script.onload = showAlert;
+                                document.head.appendChild(script);
+                            } else {
+                                showAlert();
+                            }
+                        ");
                         return;
                     }
                     
@@ -99,11 +129,26 @@ class ListAsistencias extends ListRecords
                     }
 
                     if (!$tieneFacturaValida) {
-                        Notification::make()
-                            ->title('Deuda Detectada')
-                            ->body('El cliente no posee una factura vigente o pagada que cubra la fecha actual.')
-                            ->danger()
-                            ->send();
+                        $this->js("
+                            const showAlert = () => {
+                                Swal.fire({
+                                    title: 'Deuda Detectada',
+                                    text: 'El cliente no posee una factura vigente o pagada que cubra la fecha actual.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar',
+                                    confirmButtonColor: '#10b981',
+                                    allowOutsideClick: false
+                                });
+                            };
+                            if (typeof Swal === 'undefined') {
+                                let script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                                script.onload = showAlert;
+                                document.head.appendChild(script);
+                            } else {
+                                showAlert();
+                            }
+                        ");
                         return;
                     }
                     
@@ -124,11 +169,26 @@ class ListAsistencias extends ListRecords
                         
                         // Check if the user has enough balance for requested classes
                         if ($restantesActuales < $clases_pedidas) {
-                            Notification::make()
-                                ->title('Límite insuficiente')
-                                ->body("El cliente solicita {$clases_pedidas} clases, pero solo dispone de {$restantesActuales} asistencias en su tope de este período.")
-                                ->danger()
-                                ->send();
+                            $this->js("
+                                const showAlert = () => {
+                                    Swal.fire({
+                                        title: 'Límite Insuficiente',
+                                        text: 'El cliente solicita {$clases_pedidas} clases, pero solo dispone de {$restantesActuales} asistencias en su tope de este período.',
+                                        icon: 'warning',
+                                        confirmButtonText: 'Aceptar',
+                                        confirmButtonColor: '#10b981',
+                                        allowOutsideClick: false
+                                    });
+                                };
+                                if (typeof Swal === 'undefined') {
+                                    let script = document.createElement('script');
+                                    script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                                    script.onload = showAlert;
+                                    document.head.appendChild(script);
+                                } else {
+                                    showAlert();
+                                }
+                            ");
                             return;
                         }
                         

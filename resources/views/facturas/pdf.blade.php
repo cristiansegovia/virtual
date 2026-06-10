@@ -7,13 +7,16 @@
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #222; }
         .container { max-width: 800px; margin: 0 auto; padding: 24px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .header h1 { margin: 0; font-size: 24px; }
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .header-table td { border: none; padding: 0; vertical-align: top; }
+        .header-table .logo { max-height: 80px; width: auto; }
+        .header-table h1 { margin: 0; font-size: 24px; }
+        .header-table p { margin: 2px 0; }
         .customer, .meta { margin-bottom: 16px; }
         .meta span { display: inline-block; min-width: 160px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background: #f3f3f3; }
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .items-table th, .items-table td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        .items-table th { background: #f3f3f3; }
         .text-right { text-align: right; }
         .total-row td { font-weight: bold; }
         .footer { margin-top: 32px; font-size: 11px; color: #555; }
@@ -21,16 +24,23 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div>
-                <h1>Factura</h1>
-                <p>Nro: {{ $factura->invoice_number }}</p>
-            </div>
-            <div>
-                <p><strong>Emitida:</strong> {{ $factura->fecha_emision?->format('d/m/Y') }}</p>
-                <p><strong>Vence:</strong> {{ $factura->fecha_vencimiento?->format('d/m/Y') }}</p>
-            </div>
-        </div>
+        <table class="header-table">
+            <tr>
+                <td style="width: 50%;">
+                    @if(file_exists(public_path('img/logo-afb.jpg')))
+                        <img src="{{ public_path('img/logo-afb.jpg') }}" class="logo" alt="Logo">
+                    @elseif(file_exists(public_path('img/logo-afb.png')))
+                        <img src="{{ public_path('img/logo-afb.png') }}" class="logo" alt="Logo">
+                    @endif
+                </td>
+                <td style="width: 50%; text-align: right;">
+                    <h1>Factura</h1>
+                    <p>Nro: {{ $factura->invoice_number }}</p>
+                    <p><strong>Emitida:</strong> {{ $factura->fecha_emision?->format('d/m/Y') }}</p>
+                    <p><strong>Vence:</strong> {{ $factura->fecha_vencimiento?->format('d/m/Y') }}</p>
+                </td>
+            </tr>
+        </table>
 
         <div class="customer">
             <p><strong>Cliente:</strong> {{ $factura->cliente?->nombre }} {{ $factura->cliente?->apellido }}</p>
@@ -39,7 +49,7 @@
             <p><strong>Estado:</strong> {{ ucfirst($factura->estado) }}</p>
         </div>
 
-        <table>
+        <table class="items-table">
             <thead>
                 <tr>
                     <th>Plan</th>
