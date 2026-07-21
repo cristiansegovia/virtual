@@ -68,11 +68,6 @@ class AsistenciasTable
                     ->label('Ingreso')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
-                \Filament\Tables\Columns\TextColumn::make('fecha_hora_salida')
-                    ->label('Salida')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->placeholder('En curso'),
                 \Filament\Tables\Columns\TextColumn::make('movimiento')
                     ->label('Movimiento')
                     ->getStateUsing(fn($record) => $record->fecha_hora_salida ? 'Salida' : 'Ingreso')
@@ -81,12 +76,20 @@ class AsistenciasTable
                         'Ingreso' => 'success',
                         'Salida' => 'danger',
                     }),
-                \Filament\Tables\Columns\TextColumn::make('duracion')
-                    ->label('Duración (min)'),
                 \Filament\Tables\Columns\TextColumn::make('contador_asistencias')
                     ->label('Restantes'),
-                \Filament\Tables\Columns\TextColumn::make('origen')
-                    ->label('Origen'),
+                \Filament\Tables\Columns\TextColumn::make('estado_facturacion')
+                    ->label('Estado de Facturación')
+                    ->html()
+                    ->getStateUsing(function ($record) {
+                        $facturas = $record->cliente->facturas()->where('estado', '!=', 'pagada')->get();
+                        if ($facturas->isEmpty()) {
+                            return '<span style="color: green;">Al día (Sin deudas)</span>';
+                        }
+                        return $facturas->map(function ($f) {
+                            return "<a href=\"/admin/facturas/{$f->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: #dc2626;\">Factura {$f->invoice_number} ({$f->estado}) - $ {$f->total}</a>";
+                        })->implode('<br>');
+                    }),
                 \Filament\Tables\Columns\TextColumn::make('updated_at')
                     ->label('Actualizado')
                     ->dateTime('d/m/Y H:i')
