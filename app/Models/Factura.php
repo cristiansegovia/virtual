@@ -35,6 +35,54 @@ class Factura extends Model
         return $this->belongsToMany(Plan::class);
     }
 
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'id_factura');
+    }
+
+    public function getFechaFinAttribute(): \Carbon\Carbon
+    {
+        $emision = $this->fecha_emision ? clone $this->fecha_emision : ($this->created_at ? clone $this->created_at : now());
+        $emision = \Carbon\Carbon::parse($emision)->startOfDay();
+        $fin = clone $emision;
+
+        switch (strtolower($this->periodo ?? 'mensual')) {
+            case 'diario':
+                $fin->addDay();
+                break;
+            case 'mensual':
+                $fin->addMonth();
+                break;
+            case 'trimestral':
+                $fin->addMonths(3);
+                break;
+            case 'semestral':
+                $fin->addMonths(6);
+                break;
+            case 'anual':
+                $fin->addYear();
+                break;
+            case 'pase libre':
+                $fin->addMonth();
+                break;
+            default:
+                $fin->addMonth();
+                break;
+        }
+
+        return $fin->endOfDay();
+    }
+
+    public function coversDate($date): bool
+    {
+        $target = \Carbon\Carbon::parse($date);
+        $emision = $this->fecha_emision ? clone $this->fecha_emision : ($this->created_at ? clone $this->created_at : now());
+        $inicio = \Carbon\Carbon::parse($emision)->startOfDay();
+        $fin = $this->fecha_fin;
+
+        return $target->betweenIncluded($inicio, $fin);
+    }
+
     public function getInvoiceNumberAttribute(): string
     {
         return str_pad($this->id, 5, '0', STR_PAD_LEFT);

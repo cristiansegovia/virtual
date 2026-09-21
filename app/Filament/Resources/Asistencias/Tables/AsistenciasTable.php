@@ -44,10 +44,27 @@ class AsistenciasTable
                                             ->label('Planes Inscritos')
                                             ->getStateUsing(fn($record) => $record->cliente->planes->pluck('nombre')->implode(', ') ?: 'Ninguno'),
                                     ]),
-                                \Filament\Schemas\Components\Section::make('Estado de Facturación')
+                                \Filament\Schemas\Components\Section::make('Facturación')
                                     ->schema([
+                                        \Filament\Infolists\Components\TextEntry::make('factura_actual_asistencia')
+                                            ->label('Factura Vigente al Momento del Ingreso')
+                                            ->html()
+                                            ->getStateUsing(function ($record) {
+                                                $f = $record->factura;
+                                                if (!$f) {
+                                                    return '<span style="color: #6b7280; font-style: italic;">Sin factura vinculada</span>';
+                                                }
+                                                $color = match ($f->estado) {
+                                                    'pagada' => '#16a34a',
+                                                    'vigente' => '#2563eb',
+                                                    'vencida' => '#dc2626',
+                                                    'cancelada' => '#6b7280',
+                                                    default => '#374151',
+                                                };
+                                                return "<a href=\"/admin/facturas/{$f->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: {$color}; font-weight: bold;\">Factura #{$f->invoice_number} ({$f->estado}) - $ {$f->total}</a>";
+                                            }),
                                         \Filament\Infolists\Components\TextEntry::make('facturas_estado')
-                                            ->label('Facturas Impagas / Pendientes')
+                                            ->label('Estado General del Cliente (Deudas Actuales)')
                                             ->html()
                                             ->getStateUsing(function ($record) {
                                                 $facturas = $record->cliente->facturas()->where('estado', '!=', 'pagada')->get();
@@ -55,10 +72,10 @@ class AsistenciasTable
                                                     return '<span style="color: green; font-weight: bold;">Al día (Sin deudas)</span>';
                                                 }
                                                 return $facturas->map(function ($f) {
-                                                    return "<a href=\"/admin/facturas/{$f->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: #dc2626; font-weight: bold;\">Factura {$f->invoice_number} ({$f->estado}) - $ {$f->total}</a>";
+                                                    return "<a href=\"/admin/facturas/{$f->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: #dc2626; font-weight: bold;\">Factura #{$f->invoice_number} ({$f->estado}) - $ {$f->total}</a>";
                                                 })->implode('<br>');
                                             })
-                                    ]),
+                                    ])->columns(1),
                             ])
                     ),
                 \Filament\Tables\Columns\TextColumn::make('cliente.dni')
@@ -82,13 +99,20 @@ class AsistenciasTable
                     ->label('Estado de Facturación')
                     ->html()
                     ->getStateUsing(function ($record) {
-                        $facturas = $record->cliente->facturas()->where('estado', '!=', 'pagada')->get();
-                        if ($facturas->isEmpty()) {
-                            return '<span style="color: green;">Al día (Sin deudas)</span>';
+                        $factura = $record->factura;
+                        if (!$factura) {
+                            return '<span style="color: #6b7280; font-style: italic;">Sin factura asociada</span>';
                         }
-                        return $facturas->map(function ($f) {
-                            return "<a href=\"/admin/facturas/{$f->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: #dc2626;\">Factura {$f->invoice_number} ({$f->estado}) - $ {$f->total}</a>";
-                        })->implode('<br>');
+                        
+                        $color = match ($factura->estado) {
+                            'pagada' => '#16a34a',
+                            'vigente' => '#2563eb',
+                            'vencida' => '#dc2626',
+                            'cancelada' => '#6b7280',
+                            default => '#374151',
+                        };
+
+                        return "<a href=\"/admin/facturas/{$factura->id}/edit\" target=\"_blank\" style=\"text-decoration: underline; color: {$color}; font-weight: 600;\">Factura {$factura->invoice_number} ({$factura->estado}) - $ {$factura->total}</a>";
                     }),
                 \Filament\Tables\Columns\TextColumn::make('updated_at')
                     ->label('Actualizado')

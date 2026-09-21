@@ -16,6 +16,12 @@ class AsistenciaForm
                     ->searchable()
                     ->required()
                     ->label('Cliente'),
+                \Filament\Forms\Components\Select::make('id_factura')
+                    ->relationship('factura', 'id')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "Factura #{$record->invoice_number} ({$record->estado}) - " . ($record->fecha_emision ? $record->fecha_emision->format('d/m/Y') : ''))
+                    ->searchable()
+                    ->nullable()
+                    ->label('Factura Asociada'),
                 \Filament\Forms\Components\DateTimePicker::make('fecha_hora_ingreso')
                     ->required()
                     ->label('Fecha y Hora de Ingreso')

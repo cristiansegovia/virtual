@@ -97,6 +97,7 @@ class ListAsistencias extends ListRecords
                     }
                     
                     $tieneFacturaValida = false;
+                    $facturaValida = null;
                     $ultimaEmisionValida = null;
                     
                     $facturas = $cliente->facturas()->orderBy('fecha_emision', 'desc')->get();
@@ -106,24 +107,11 @@ class ListAsistencias extends ListRecords
                             continue;
                         }
                         
-                        $emision = clone ($factura->fecha_emision ?? $factura->created_at);
-                        $emision->startOfDay();
-                        
-                        $fin = clone $emision;
-                        switch (strtolower($factura->periodo)) {
-                            case 'diario': $fin->addDay(); break;
-                            case 'mensual': $fin->addMonth(); break;
-                            case 'trimestral': $fin->addMonths(3); break;
-                            case 'semestral': $fin->addMonths(6); break;
-                            case 'anual': $fin->addYear(); break;
-                            case 'pase libre': $fin->addMonth(); break;
-                            default: $fin->addMonth(); break;
-                        }
-                        $fin->endOfDay();
-                        
-                        if ($hoy->betweenIncluded($emision, $fin)) {
+                        if ($factura->coversDate($hoy)) {
                             $tieneFacturaValida = true;
-                            $ultimaEmisionValida = clone $emision;
+                            $facturaValida = $factura;
+                            $emision = clone ($factura->fecha_emision ?? $factura->created_at);
+                            $ultimaEmisionValida = clone $emision->startOfDay();
                             break;
                         }
                     }
@@ -197,6 +185,7 @@ class ListAsistencias extends ListRecords
                         
                     Asistencia::create([
                         'id_cliente' => $cliente->id,
+                        'id_factura' => $facturaValida?->id,
                         'fecha_hora_ingreso' => $hoy,
                         'fecha_hora_salida' => null,
                         'origen' => 'admin',
