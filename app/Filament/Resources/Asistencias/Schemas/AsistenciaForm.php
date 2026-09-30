@@ -16,6 +16,12 @@ class AsistenciaForm
                     ->searchable()
                     ->required()
                     ->label('Cliente'),
+                \Filament\Forms\Components\Select::make('id_plan')
+                    ->relationship('plan', 'nombre')
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->label('Plan / Actividad'),
                 \Filament\Forms\Components\Select::make('id_factura')
                     ->relationship('factura', 'id')
                     ->getOptionLabelFromRecordUsing(fn ($record) => "Factura #{$record->invoice_number} ({$record->estado}) - " . ($record->fecha_emision ? $record->fecha_emision->format('d/m/Y') : ''))
@@ -35,7 +41,11 @@ class AsistenciaForm
                 \Filament\Forms\Components\TextInput::make('contador_asistencias')
                     ->numeric()
                     ->default(0)
-                    ->label('Asistencias del Mes'),
+                    ->label('Restantes del Plan'),
+                \Filament\Forms\Components\TextInput::make('clases_consumidas')
+                    ->numeric()
+                    ->default(1)
+                    ->label('Clases Consumidas'),
                 \Filament\Forms\Components\TextInput::make('duracion')
                     ->numeric()
                     ->label('Duración (min)'),

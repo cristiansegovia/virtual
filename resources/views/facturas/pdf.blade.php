@@ -67,7 +67,7 @@
             <tfoot>
                 <tr class="total-row">
                     <td>Total</td>
-                    <td class="text-right">${{ number_format($factura->total, 2) }}</td>
+                    <td class="text-right">${{ number_format(($factura->total > 0) ? $factura->total : $factura->planes->sum('valor'), 2) }}</td>
                 </tr>
             </tfoot>
         </table>

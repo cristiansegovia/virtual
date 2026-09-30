@@ -57,7 +57,11 @@ class AsignarFacturasAsistenciasSeeder extends Seeder
             }
 
             if ($facturaAsignada) {
-                $asistencia->updateQuietly(['id_factura' => $facturaAsignada->id]);
+                $planId = $asistencia->id_plan ?? $facturaAsignada->planes->first()?->id ?? $cliente->planes->first()?->id;
+                $asistencia->updateQuietly([
+                    'id_factura' => $facturaAsignada->id,
+                    'id_plan' => $planId,
+                ]);
                 $actualizadas++;
             } else {
                 $noAsignadas++;

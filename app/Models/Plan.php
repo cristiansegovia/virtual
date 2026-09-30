@@ -34,4 +34,9 @@ class Plan extends Model
     {
         return $this->belongsToMany(Factura::class);
     }
+
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'id_plan');
+    }
 }

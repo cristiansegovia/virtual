@@ -8,6 +8,7 @@ class Asistencia extends Model
 {
     protected $fillable = [
         'id_cliente',
+        'id_plan',
         'id_factura',
         'fecha_hora_ingreso',
         'fecha_hora_salida',
@@ -21,6 +22,7 @@ class Asistencia extends Model
     protected function casts(): array
     {
         return [
+            'id_plan' => 'integer',
             'id_factura' => 'integer',
             'fecha_hora_ingreso' => 'datetime',
             'fecha_hora_salida' => 'datetime',
@@ -34,6 +36,11 @@ class Asistencia extends Model
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'id_cliente');
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'id_plan');
     }
 
     public function factura()

@@ -53,4 +53,9 @@ class EditFactura extends EditRecord
                 ->requiresConfirmation(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->record->recalculateTotal();
+    }
 }

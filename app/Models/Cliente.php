@@ -50,16 +50,18 @@ class Cliente extends Model
         static::created(function ($cliente) {
             // Generar primera factura si tiene planes
             if ($cliente->planes->isNotEmpty()) {
+                $totalInicial = (float) $cliente->planes->sum('valor');
                 $factura = Factura::create([
                     'cliente_id' => $cliente->id,
-                    'periodo' => 'mensual', // o determinar basado en planes
+                    'periodo' => 'mensual',
                     'estado' => 'vigente',
                     'detalle' => 'Factura inicial',
                     'fecha_emision' => now(),
+                    'total' => $totalInicial,
                 ]);
 
                 $factura->planes()->attach($cliente->planes->pluck('id'));
-                // El saving event calculará fecha_vencimiento y total
+                $factura->recalculateTotal();
             }
         });
     }

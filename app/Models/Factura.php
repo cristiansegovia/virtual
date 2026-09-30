@@ -88,6 +88,37 @@ class Factura extends Model
         return str_pad($this->id, 5, '0', STR_PAD_LEFT);
     }
 
+    public function getTotalAttribute($value)
+    {
+        $val = (float) $value;
+        if ($val > 0) {
+            return $val;
+        }
+
+        if ($this->relationLoaded('planes') && $this->planes->isNotEmpty()) {
+            $sum = (float) $this->planes->sum('valor');
+            if ($sum > 0) {
+                return $sum;
+            }
+        } elseif ($this->exists) {
+            $sum = (float) $this->planes()->sum('valor');
+            if ($sum > 0) {
+                return $sum;
+            }
+        }
+
+        return $val;
+    }
+
+    public function recalculateTotal(): self
+    {
+        $calculated = (float) $this->planes()->sum('valor');
+        if ((float) $this->getRawOriginal('total') !== $calculated) {
+            $this->updateQuietly(['total' => $calculated]);
+        }
+        return $this;
+    }
+
     protected static $updatingTotal = false;
 
     protected static function boot()
@@ -104,10 +135,11 @@ class Factura extends Model
         static::saved(function ($factura) {
             if (!self::$updatingTotal) {
                 self::$updatingTotal = true;
-                $calculated = $factura->planes->sum('valor');
-                if ($factura->total != $calculated) {
-                    $factura->total = $calculated;
-                    $factura->save();
+                if ($factura->relationLoaded('planes') && $factura->planes->isNotEmpty()) {
+                    $calculated = (float) $factura->planes->sum('valor');
+                    if ((float) $factura->getRawOriginal('total') !== $calculated) {
+                        $factura->updateQuietly(['total' => $calculated]);
+                    }
                 }
                 self::$updatingTotal = false;
             }

@@ -33,6 +33,7 @@ class FacturaForm
                         'semestral' => 'Semestral',
                         'anual' => 'Anual',
                     ])
+                    ->default('mensual')
                     ->required(),
                 CheckboxList::make('planes')
                     ->label('Planes')
@@ -53,7 +54,8 @@ class FacturaForm
                     ->label('Total')
                     ->numeric()
                     ->prefix('$')
-                    ->disabled(),
+                    ->disabled()
+                    ->dehydrated(),
                 Textarea::make('detalle')
                     ->label('Detalle')
                     ->nullable(),

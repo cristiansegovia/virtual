@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateFactura extends CreateRecord
 {
     protected static string $resource = FacturaResource::class;
+
+    protected function afterCreate(): void
+    {
+        $this->record->recalculateTotal();
+    }
 }

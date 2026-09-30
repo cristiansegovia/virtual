@@ -9,6 +9,10 @@ Route::get('/', function () {
 });
 
 Route::get('/facturas/{factura}/pdf', function (Factura $factura) {
+    $factura->loadMissing('planes', 'cliente');
+    if ((float) $factura->total <= 0 && $factura->planes->isNotEmpty()) {
+        $factura->recalculateTotal();
+    }
     $pdf = Pdf::loadView('facturas.pdf', compact('factura'));
 
     return $pdf->download(sprintf('factura-%s.pdf', $factura->id));
