@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE facturas MODIFY COLUMN periodo ENUM('diario', 'mensual', 'trimestral', 'semestral', 'anual', 'pase libre') NOT NULL");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE facturas MODIFY COLUMN periodo ENUM('diario', 'mensual', 'trimestral', 'semestral', 'anual', 'pase libre') NOT NULL");
+        }
     }
 
     /**
@@ -20,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE facturas MODIFY COLUMN periodo ENUM('mensual', 'trimestral', 'semestral', 'anual', 'pase libre') NOT NULL");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE facturas MODIFY COLUMN periodo ENUM('mensual', 'trimestral', 'semestral', 'anual', 'pase libre') NOT NULL");
+        }
     }
 };
